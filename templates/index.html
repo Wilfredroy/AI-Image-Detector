@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Checker</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            margin: 0;
+            overflow: hidden;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            animation: fadeIn 1s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+            animation: slideDown 1s ease-in-out;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        input[type="file"] {
+            margin: 15px 0;
+            padding: 15px;
+            border: 2px dashed #764ba2;
+            width: 100%;
+            background: #f9f9f9;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+        
+        input[type="file"]:hover {
+            background: #e0e0e0;
+        }
+        
+        button {
+            padding: 12px 25px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+        
+        button:hover {
+            background: #ff4757;
+            transform: scale(1.05);
+        }
+        
+        #imagePreview {
+            margin-top: 15px;
+            max-width: 100%;
+            border-radius: 10px;
+            display: none;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1s ease-in-out;
+        }
+        
+        #result {
+            margin-top: 20px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+            animation: fadeIn 2s ease-in-out;
+        }
+    </style>
+    <script>
+        function uploadImage() {
+            let formData = new FormData();
+            let fileInput = document.getElementById("imageInput");
+            let resultDiv = document.getElementById("result");
+            let imagePreview = document.getElementById("imagePreview");
+            
+            if (fileInput.files.length === 0) {
+                alert("Please select an image");
+                return;
+            }
+            
+            let file = fileInput.files[0];
+            formData.append("image", file);
+            
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = "block";
+            };
+            reader.readAsDataURL(file);
+            
+            fetch("/upload", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                resultDiv.innerHTML = "Result: " + data.result;
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Image Checker</h1>
+        <input type="file" id="imageInput" accept="image/png, image/jpeg" onchange="uploadImage()">
+        <img id="imagePreview" src="" alt="Image Preview">
+        <div id="result"></div>
+    </div>
+</body>
+</html>
